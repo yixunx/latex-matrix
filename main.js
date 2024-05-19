@@ -1,10 +1,10 @@
 addEvents = () => {
-    document.getElementById('text-input').addEventListener("keyup", function (event) {
-        event.preventDefault();
-        if (event.keyCode == 13) {
-            document.getElementById("gen-latex-text").click();
-        }
-    });
+    // document.getElementById('text-input').addEventListener("keyup", function (event) {
+    //     event.preventDefault();
+    //     if (event.keyCode == 13) {
+    //         document.getElementById("gen-latex-text").click();
+    //     }
+    // });
 
     document.getElementById('text-input').addEventListener('keydown', (e) => {
         if (e.keyCode == 9) {
@@ -14,6 +14,20 @@ addEvents = () => {
             if (e.preventDefault)
                 e.preventDefault();
             return false;
+        }
+    });
+
+    document.addEventListener('keypress', function(event) {
+        if (event.key === 'Enter' && event.shiftKey) {
+            let text = document.getElementById('text-input').value;
+            console.log("text", text);
+            if (/^\s*$/.test(text)) {
+                console.log("generating table");
+                document.getElementById("gen-latex-table").click();
+            } else {
+                console.log("generating text");
+                document.getElementById("gen-latex-text").click();
+            }
         }
     });
 }
@@ -52,9 +66,12 @@ genLatexFromText = () => {
     let text = document.getElementById('text-input').value;
     let matrix_type = document.getElementById('matrix-value').value;
     let rows = text.split('\n');
-    let latex = `$ \\begin{${matrix_type}}\n`;
+    let latex = `\\begin{${matrix_type}}\n`;
     rows.forEach((r_val, r_idx) => {
-        let cols = r_val.split('\t');
+        if (r_val.trim() == "")
+            return;
+
+        let cols = r_val.trim().split(/\s+/);
         cols.forEach((c_val, c_idx) => {
             let neg = false;
             if (c_val.indexOf('-') == 0) {
@@ -76,15 +93,16 @@ genLatexFromText = () => {
             }
         });
     });
-    latex += `\\end{${matrix_type}}  $`
+    latex += `\\end{${matrix_type}}`
 
+    navigator.clipboard.writeText(latex);
     document.getElementById("latex").value = latex;
 }
 
 genLatex = () => {
     let table = document.getElementById('table').children[0];
     let matrix_type = document.getElementById('matrix-value').value;
-    let latex = `$ \\begin{${matrix_type}}\n`;
+    let latex = `\\begin{${matrix_type}}\n`;
     let rows = table.children;
     for (let row = 0; row < rows.length; row++) {
         let cols = rows[row].children;
@@ -111,7 +129,8 @@ genLatex = () => {
             }
         }
     }
-    latex += `\\end{${matrix_type}}  $`
+    latex += `\\end{${matrix_type}}`
 
+    navigator.clipboard.writeText(latex);
     document.getElementById("latex").value = latex;
 }
