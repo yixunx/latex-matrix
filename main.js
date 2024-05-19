@@ -28,6 +28,9 @@ addEvents = () => {
                 console.log("generating text");
                 document.getElementById("gen-latex-text").click();
             }
+            if (event.preventDefault) {
+                event.preventDefault();
+            }
         }
     });
 }
